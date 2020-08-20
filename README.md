@@ -137,6 +137,8 @@ docker-compose exec jskos-server /usr/src/app/bin/import.js concepts https://raw
 docker-compose exec jskos-server /usr/src/app/bin/import.js schemes https://coli-conc.gbv.de/api/voc?uri=http://bartoc.org/en/node/1940
 ```
 
+For importing data from local files instead of URLs, please note the caveat [on the bottom of the documentation on Docker Hub](https://hub.docker.com/r/coliconc/jskos-server).
+
 ### Create User in Login Server
 Use the included script to create a new local provider with a test user:
 
@@ -149,7 +151,7 @@ Hit Ctrl+C to exit the script after you created the provider and user.
 **Note:** This is mostly to have an account for testing. For productive use, you can also use one of a few available identity providers ([documentation](https://github.com/gbv/login-server#strategies)).
 
 ### Restart and Launch
-We have to restart the containers one last time:
+We have to restart the containers one last time to apply the changes:
 
 ```bash
 docker-compose restart
@@ -157,5 +159,12 @@ docker-compose restart
 
 Now open Cocoda at http://localhost:30100/. On the top right, hover over "Account" and click on Login. In the popover, click on "Log in via <name of your provider>" and use the just created user to log in. Close the popover. Cocoda is now ready to be used.
 
+## Notes
+- If you change any of the ports (or use a proxy), you need to adjust the configuration files of Cocoda and jskos-server as well as the entry for login-server in the `docker-compose.yml` file.
+  - Examples on how to use it with a proxy will be added later.
+  - We will try to simplify this by using environment variables for the base URLs and ports for all services. For now, manual adjustment is necessary.
+- When changing the configuration of jskos-server or login-server, you need to restart those containers (e.g. by running `docker-compose restart jskos-server`). Cocoda requests the configuration file on startup, so you only need to reload the web page to apply the changes.
+- To update the containers, run `docker-compose pull; docker-compose up -d`. Note that it might make sense for you to pin the containers to their major version in `docker-compose.yml` to prevent issues when updating (e.g. by using `coliconc/cocoda:1`). If we are releasing a new major version, we will add instructions on how to upgrade your installation.
+
 ## Questions
-Docker support for our services is very young and you might run into issues when setting this up. Please create an issue in this repository for any general questions or issues. If you think you have found a specific issue related to one of the tools, please open an issue in the respective repository.
+Docker support for our services is very young and you might run into issues when setting this up. Please create an issue in this repository for any general questions or issues related to the Docker setup. If you think you have found a specific issue related to one of the tools, please open an issue in the respective repository.
