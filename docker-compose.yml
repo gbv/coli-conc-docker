@@ -1,0 +1,50 @@
+version: "3"
+
+services:
+  cocoda:
+    image: coliconc/cocoda
+    volumes:
+      - ./data/cocoda:/config
+    ports:
+      # Use host port 30100
+      - 30100:80
+    restart: always
+
+  jskos-server:
+    image: coliconc/jskos-server
+    # replace this with your UID/GID if necessary (id -u; id -g); remove on macOS/Windows
+    user: 1000:1000
+    depends_on:
+      - mongo
+    volumes:
+      - ./data/jskos-server:/config
+    # environment:
+    #   - NODE_ENV=production # note that this requires the server to be run behind a HTTPS proxy
+    ports:
+      - 30101:3000
+    restart: always
+
+  login-server:
+    image: coliconc/login-server
+    # replace this with your UID/GID if necessary (id -u; id -g); remove on macOS/Windows
+    user: 1000:1000
+    depends_on:
+      - mongo
+    volumes:
+      - ./data/login-server:/config
+      # - ./data/login-server-static:/usr/src/app/static # if required
+    environment:
+      - MONGO_HOST=mongo
+      - BASE_URL=http://localhost:30104/
+      - ALLOWED_ORIGINS=http://localhost:30100
+    ports:
+      - 30104:3004
+    restart: always
+
+  mongo:
+    image: mongo:4
+    # replace this with your UID/GID if necessary (id -u; id -g); remove on macOS/Windows
+    user: 1000:1000
+    volumes:
+      - ./data/db:/data/db
+    restart: always
