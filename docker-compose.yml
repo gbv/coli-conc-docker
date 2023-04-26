@@ -2,7 +2,7 @@ version: "3"
 
 services:
   cocoda:
-    image: coliconc/cocoda
+    image: ghcr.io/gbv/cocoda:1
     volumes:
       - ./data/cocoda:/config
     ports:
@@ -11,11 +11,9 @@ services:
     restart: unless-stopped
 
   jskos-server:
-    image: coliconc/jskos-server
-    # replace this with your UID/GID if necessary (id -u; id -g); remove on macOS/Windows
-    user: 1000:1000
+    image: ghcr.io/gbv/jskos-server:2
     depends_on:
-      - mongo
+      - db
     volumes:
       - ./data/jskos-server:/config
     # environment:
@@ -25,26 +23,22 @@ services:
     restart: unless-stopped
 
   login-server:
-    image: coliconc/login-server
-    # replace this with your UID/GID if necessary (id -u; id -g); remove on macOS/Windows
-    user: 1000:1000
+    image: ghcr.io/gbv/login-server:0.6
     depends_on:
-      - mongo
+      - db
     volumes:
       - ./data/login-server:/config
       # - ./data/login-server-static:/usr/src/app/static # if required
     environment:
-      - MONGO_HOST=mongo
+      - MONGO_HOST=db
       - BASE_URL=http://localhost:30104/
       - ALLOWED_ORIGINS=http://localhost:30100
     ports:
       - 30104:3004
     restart: unless-stopped
 
-  mongo:
-    image: mongo:4
-    # replace this with your UID/GID if necessary (id -u; id -g); remove on macOS/Windows
-    user: 1000:1000
+  db:
+    image: mongo:6
     volumes:
       - ./data/db:/data/db
     restart: unless-stopped
