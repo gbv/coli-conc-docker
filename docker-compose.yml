@@ -41,4 +41,5 @@ services:
     image: mongo:6
     volumes:
       - ./data/db:/data/db
+    # command: su -c "mongod --bind_ip_all" root # recommended if run under Rootless Docker (as it will map the volume files to your UID instead of a subordinate UID)
     restart: unless-stopped
