@@ -67,8 +67,8 @@ cat <<EOT > data/cocoda/cocoda.json
     {
       "provider": "ConceptApi",
       "uri": "http://coli-conc.gbv.de/registry/wikidata-concepts",
-      "data": "//coli-conc.gbv.de/services/wikidata/concept/",
-      "suggest": "//coli-conc.gbv.de/services/wikidata/suggest?search={searchTerms}",
+      "data": "https://coli-conc.gbv.de/services/wikidata/concept/",
+      "suggest": "https://coli-conc.gbv.de/services/wikidata/suggest?search={searchTerms}",
       "schemes": [
         {
           "uri": "http://bartoc.org/en/node/1940",
