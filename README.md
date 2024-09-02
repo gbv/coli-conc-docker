@@ -7,6 +7,8 @@ We will be using:
 - Login Server (authentication server used in Cocoda to authenticate to JSKOS Server) ([GitHub](https://github.com/gbv/login-server), [Docker Info](https://github.com/gbv/login-server/blob/master/docker/README.md))
 - MongoDB (database for storing our data) ([Website](https://www.mongodb.com), [Docker Hub](https://hub.docker.com/_/mongo))
 
+See also the repository <https://github.com/gbv/coli-conc-server> for the full setup of coli-conc services,  including the services listed above, configured to be hosted at <https://coli-conc.gbv.de/>.
+
 ## Setup
 Requirements: [Docker](https://docs.docker.com/engine/), [Docker Compose](https://docs.docker.com/compose/)
 
