@@ -65,27 +65,6 @@ cat <<EOT > data/cocoda/cocoda.json
       "prefLabel": {
         "en": "Mappings"
       }
-    },
-    {
-      "provider": "ConceptApi",
-      "uri": "http://coli-conc.gbv.de/registry/wikidata-concepts",
-      "data": "https://coli-conc.gbv.de/services/wikidata/concept/",
-      "suggest": "https://coli-conc.gbv.de/services/wikidata/suggest?search={searchTerms}",
-      "schemes": [
-        {
-          "uri": "http://bartoc.org/en/node/1940",
-          "concepts": [
-            null
-          ],
-          "topConcepts": [],
-          "notation": [
-            "WD"
-          ],
-          "prefLabel": {
-            "en": "Wikidata"
-          }
-        }
-      ]
     }
   ],
   "overrideRegistries": true,
@@ -96,8 +75,6 @@ cat <<EOT > data/cocoda/cocoda.json
 }
 EOT
 ```
-
-We also set up access to Wikidata concepts via [wikidata-jskos](https://github.com/gbv/wikidata-jskos) (for best compatibility, import the Wikidata scheme into jskos-server as well; see [data import](#data-import) below). Adjust the configuration as necessary (see also [Cocoda's documentation on the config file](https://github.com/gbv/cocoda#configuration)).
 
 ### jskos-server
 Let's create the basic configuration file for jskos-server and inject the public key that login-server created earlier into it:
@@ -119,7 +96,7 @@ EOT
 jskos-server offers a variety of configuration options, especially in regards to write access. Please refer to [the documentation](https://github.com/gbv/jskos-server#configuration) on how to further configure it. For now, the default configuration (apart from the above) should be sufficient.
 
 ## Startup, Data Import, and Final Configuration
-At this point, we can start the whole suite of applications using docker compose:
+At this point, we can start the whole suite of applications using Docker Compose:
 
 ```bash
 docker compose up -d
@@ -130,16 +107,14 @@ As an example, we are going to import the [IxTheo classification](https://www.ix
 
 ```bash
 # Indexes only have to created once per database
-docker compose exec jskos-server /usr/src/app/bin/import.js --indexes
-# Importing the IxTheo scheme
-docker compose exec jskos-server /usr/src/app/bin/import.js schemes https://raw.githubusercontent.com/gbv/jskos-data/master/ixtheo/ixtheo-scheme.json
-# Importing the IxTheo concepts
-docker compose exec jskos-server /usr/src/app/bin/import.js concepts https://raw.githubusercontent.com/gbv/jskos-data/master/ixtheo/ixtheo.ndjson
-# We'll also import the Wikidata scheme so that our instance works well with mappings containing Wikidata concepts:
-docker compose exec jskos-server /usr/src/app/bin/import.js schemes https://coli-conc.gbv.de/api/voc?uri=http://bartoc.org/en/node/1940
+docker compose exec -it jskos-server /usr/src/app/bin/import.js --indexes
+# We'll import all coli-conc related vocabularies from BARTOC, which will automatically allow us to access them via their respective APIs
+docker compose exec -it jskos-server /usr/src/app/bin/import.js schemes "https://bartoc.org/api/voc?partOf=http%3A%2F%2Fbartoc.org%2Fen%2Fnode%2F18926"
+# Importing the IxTheo concepts (and update IxTheo's `API` field in the local database)
+docker compose exec -it jskos-server /usr/src/app/bin/import.js concepts --set-api https://raw.githubusercontent.com/gbv/jskos-data/master/ixtheo/ixtheo.ndjson
 ```
 
-For importing data from local files instead of URLs, please note the caveat [on the bottom of the Docker documentation](https://github.com/gbv/jskos-server/blob/master/docker/README.md).
+For importing data from local files instead of URLs, please note the caveat [on the bottom of the Docker documentation](https://github.com/gbv/jskos-server/tree/master/docker#data-import).
 
 ### Create User in Login Server
 Use the included script to create a new local provider with a test user:
@@ -169,4 +144,4 @@ Now open Cocoda at http://localhost:30100/. On the top right, hover over "Accoun
 - To update the containers, run `docker compose pull; docker compose up -d`. Note that it might make sense for you to pin the containers to their major version in `docker-compose.yml` to prevent issues when updating (e.g. by using `ghcr.io/gbv/cocoda:1`). If we are releasing a new major version, we will add instructions on how to upgrade your installation.
 
 ## Questions
-Docker support for our services is very young and you might run into issues when setting this up. Please create an issue in this repository for any general questions or issues related to the Docker setup. If you think you have found a specific issue related to one of the tools, please open an issue in the respective repository.
+Please create an issue in this repository for any general questions or issues related to the Docker setup. If you think you have found a specific issue related to one of the tools, please open an issue in the respective repository.
